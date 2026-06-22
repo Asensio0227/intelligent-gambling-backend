@@ -1,0 +1,78 @@
+node_modules/
+dist/
+logs/
+*.log
+.env
+.env.local
+.env.production
+coverage/
+.DS_Store
+
+prompt
+logs
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.staging
+.env.test
+.env.production
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# TypeScript
+*.tsbuildinfo
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Runtime / temp
+pids/
+*.pid
+*.pid.lock
+tmp/
+temp/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.suo
+*.sw?
+
+# Yarn / npm
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+.npm/
+
+# Misc
+prompt
+logs
