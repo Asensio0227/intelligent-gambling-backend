@@ -1,10 +1,12 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Fixture, IFixture } from '../models/Fixture';
 import { fetchUpcomingFixtures } from '../services/apifootball.service';
 import { ApiFootballFixture } from '../types/apifootball.types';
 
-export const mapApiFixture = (apiFixture: ApiFootballFixture): Partial<IFixture> => {
+export const mapApiFixture = (
+  apiFixture: ApiFootballFixture,
+): Partial<IFixture> => {
   const fixture = apiFixture.fixture || {};
   return {
     fixtureId: String(fixture.id),
@@ -34,14 +36,16 @@ export const mapApiFixture = (apiFixture: ApiFootballFixture): Partial<IFixture>
       htHomeGoals: (apiFixture.score?.halftime as any)?.home,
       htAwayGoals: (apiFixture.score?.halftime as any)?.away,
       corners: {
-        home: (apiFixture.statistics as any)
-          ?.find((stat: any) => stat.type === 'Corner Kicks')
-          ?.statistics?.find((item: any) => item.value?.endsWith('home'))?.value ||
-          undefined,
-        away: (apiFixture.statistics as any)
-          ?.find((stat: any) => stat.type === 'Corner Kicks')
-          ?.statistics?.find((item: any) => item.value?.endsWith('away'))?.value ||
-          undefined,
+        home:
+          (apiFixture.statistics as any)
+            ?.find((stat: any) => stat.type === 'Corner Kicks')
+            ?.statistics?.find((item: any) => item.value?.endsWith('home'))
+            ?.value || undefined,
+        away:
+          (apiFixture.statistics as any)
+            ?.find((stat: any) => stat.type === 'Corner Kicks')
+            ?.statistics?.find((item: any) => item.value?.endsWith('away'))
+            ?.value || undefined,
       },
       yellowCards: {
         home: undefined,
@@ -73,7 +77,8 @@ export const listFixtures = async (
     }
     if (req.query.from || req.query.to) {
       filter.kickoff = {};
-      if (req.query.from) filter.kickoff.$gte = new Date(req.query.from as string);
+      if (req.query.from)
+        filter.kickoff.$gte = new Date(req.query.from as string);
       if (req.query.to) filter.kickoff.$lte = new Date(req.query.to as string);
     }
 
@@ -99,7 +104,9 @@ export const listFixtures = async (
     const sortParam = String(req.query.sort ?? 'asc').toLowerCase();
     const sortOrder = sortParam === 'desc' ? -1 : 1;
 
-    const fixtures = await Fixture.find(filter as any).sort({ kickoff: sortOrder }).lean();
+    const fixtures = await Fixture.find(filter as any)
+      .sort({ kickoff: sortOrder })
+      .lean();
     res.json({
       success: true,
       data: fixtures,
@@ -116,7 +123,7 @@ export const getFixture = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id as string)) {
       res.status(400).json({
         success: false,
         data: {},
@@ -198,8 +205,14 @@ export const liveFixtures = async (
         { status: 'ET' },
         { status: 'P' },
       ],
-    }).sort({ kickoff: 1 }).lean();
-    res.json({ success: true, data: fixtures, message: 'Live fixtures fetched' });
+    } as any)
+      .sort({ kickoff: 1 })
+      .lean();
+    res.json({
+      success: true,
+      data: fixtures,
+      message: 'Live fixtures fetched',
+    });
   } catch (error) {
     next(error);
   }
@@ -216,8 +229,14 @@ export const upcomingFixtures = async (
     const fixtures = await Fixture.find({
       status: 'NS',
       kickoff: { $gte: now, $lte: future },
-    }).sort({ kickoff: 1 }).lean();
-    res.json({ success: true, data: fixtures, message: 'Upcoming fixtures fetched' });
+    })
+      .sort({ kickoff: 1 })
+      .lean();
+    res.json({
+      success: true,
+      data: fixtures,
+      message: 'Upcoming fixtures fetched',
+    });
   } catch (error) {
     next(error);
   }
