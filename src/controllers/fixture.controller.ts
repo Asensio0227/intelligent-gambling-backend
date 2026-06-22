@@ -57,18 +57,18 @@ export const listFixtures = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const filter: any = {};
-    if (req.query.league) filter['league.name'] = req.query.league;
+    const filter: Record<string, any> = {};
+    if (req.query.league) filter['league.name'] = String(req.query.league);
     if (req.query.status) {
       if (req.query.status === 'FT') {
         // Show past fixtures — either FT status or kickoff already passed
         const now = new Date();
-        filter.$or = [
+        filter['$or'] = [
           { status: { $in: ['FT', 'AET', 'PEN'] } },
           { kickoff: { $lt: now }, status: 'NS' }, // matches that should have finished
         ];
       } else {
-        filter.status = req.query.status;
+        filter.status = String(req.query.status);
       }
     }
     if (req.query.from || req.query.to) {
@@ -87,9 +87,9 @@ export const listFixtures = async (
         ],
       };
       // Combine with existing $or (status=FT) using $and if both are present
-      if (filter.$or) {
-        filter.$and = [{ $or: filter.$or }, searchClause];
-        delete filter.$or;
+      if (filter['$or']) {
+        filter['$and'] = [{ $or: filter['$or'] }, searchClause];
+        delete filter['$or'];
       } else {
         Object.assign(filter, searchClause);
       }
@@ -99,7 +99,7 @@ export const listFixtures = async (
     const sortParam = String(req.query.sort ?? 'asc').toLowerCase();
     const sortOrder = sortParam === 'desc' ? -1 : 1;
 
-    const fixtures = await Fixture.find(filter).sort({ kickoff: sortOrder }).lean();
+    const fixtures = await Fixture.find(filter as any).sort({ kickoff: sortOrder }).lean();
     res.json({
       success: true,
       data: fixtures,
