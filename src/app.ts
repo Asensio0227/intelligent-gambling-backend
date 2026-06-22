@@ -7,6 +7,7 @@ import { errorHandler } from './middleware/errorHandler';
 import requestLogger from './middleware/requestLogger';
 
 import adminRoutes from './routes/admin.routes';
+import healthRoutes from './routes/health.routes';
 import authRoutes from './routes/auth.routes';
 import fixtureRoutes from './routes/fixture.routes';
 import notificationRoutes from './routes/notification.routes';
@@ -36,6 +37,7 @@ app.use(cors());
 app.use(express.json());
 app.use(requestLogger);
 
+app.use('/api/health', healthRoutes);
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/fixtures', fixtureRoutes);
