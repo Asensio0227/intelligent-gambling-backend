@@ -11,7 +11,7 @@ export interface MarketAccuracyStats {
 }
 
 const MARKETS = [
-  'result', 'correctScore', 'goalsOverUnder', 'bts',
+  'result', 'doubleChance', 'correctScore', 'goalsOverUnder', 'bts',
   'cornersOverUnder', 'yellowCards', 'highestScoringHalf',
 ];
 

@@ -1,6 +1,7 @@
 export interface GPTPredictionResponse {
   markets: {
     result: { prediction: 'HOME' | 'DRAW' | 'AWAY'; confidence: number };
+    doubleChance: { prediction: 'HOME_OR_DRAW' | 'AWAY_OR_DRAW'; confidence: number };
     correctScore: { prediction: string; confidence: number };
     goalsOverUnder: { line: number; prediction: 'OVER' | 'UNDER'; confidence: number };
     bts: { prediction: boolean; confidence: number };
@@ -12,6 +13,7 @@ export interface GPTPredictionResponse {
     summary: string;
     perMarket: {
       result: string;
+      doubleChance: string;
       correctScore: string;
       goalsOverUnder: string;
       bts: string;

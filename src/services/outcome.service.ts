@@ -78,8 +78,15 @@ export const resolvePredictionOutcomes = async (): Promise<{
     if (!fixture) return null;
 
     const actual = getMatchOutcome(fixture);
+    const dcPrediction: string | undefined = (prediction.markets as any)?.doubleChance?.prediction;
+    const doubleChanceCorrect = dcPrediction === 'HOME_OR_DRAW'
+      ? actual.winner === 'HOME' || actual.winner === 'DRAW'
+      : dcPrediction === 'AWAY_OR_DRAW'
+        ? actual.winner === 'AWAY' || actual.winner === 'DRAW'
+        : false;
     const accuracy = {
       result: (prediction.markets as any)?.result?.prediction === actual.winner,
+      doubleChance: doubleChanceCorrect,
       correctScore:
         (prediction.markets as any)?.correctScore?.prediction ===
         actual.correctScore,

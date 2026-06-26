@@ -39,6 +39,7 @@ export interface IReasoning {
     cornersOverUnder?: string;
     yellowCards?: string;
     highestScoringHalf?: string;
+    doubleChance?: string;
   };
 }
 
@@ -126,6 +127,7 @@ const reasoningSchema = new Schema<IReasoning>(
       cornersOverUnder: String,
       yellowCards: String,
       highestScoringHalf: String,
+      doubleChance: String,
     },
   },
   { _id: false },
@@ -152,6 +154,7 @@ const outcomeSchema = new Schema<IOutcome>(
       cornersOverUnder: Boolean,
       yellowCards: Boolean,
       highestScoringHalf: Boolean,
+      doubleChance: Boolean,
     },
   },
   { _id: false },

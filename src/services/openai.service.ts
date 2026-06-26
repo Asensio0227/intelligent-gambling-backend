@@ -15,7 +15,7 @@ export const buildPredictionPrompt = (
   accuracyStats: any[] = [],
 ): string => {
   const lines: string[] = [];
-  lines.push(`You are an expert football prediction analyst with deep knowledge of international and club football. Your task is to analyze the provided match data and generate predictions with confidence scores for 7 markets.
+  lines.push(`You are an expert football prediction analyst with deep knowledge of international and club football. Your task is to analyze the provided match data and generate predictions with confidence scores for 8 markets.
 
 IMPORTANT INSTRUCTIONS:
 - When statistical data is provided (form, averages, h2h history), use it as your PRIMARY source
@@ -24,6 +24,7 @@ IMPORTANT INSTRUCTIONS:
 - Never return all confidence scores at 50 — this means you are not using your knowledge. Always reason from what you know
 - Confidence scores should reflect genuine analytical assessment: 70-85% for strong signals, 55-70% for moderate signals, 40-55% for genuinely uncertain outcomes
 - Correct score predictions will naturally have lower confidence (20-40%) — this is expected
+- For the doubleChance market: predict HOME_OR_DRAW if the home side is favoured or a draw is likely (i.e. away win is the unlikely outcome), or AWAY_OR_DRAW if the away side is favoured or a draw is likely (i.e. home win is the unlikely outcome). This must be consistent with your result prediction.
 - Return ONLY valid JSON with no extra text, no markdown, no preamble
 
 CONFIDENCE SCORE GUIDANCE:
@@ -81,6 +82,7 @@ You must always return the exact JSON structure specified in the user message.`)
       {
         markets: {
           result: { prediction: 'HOME|DRAW|AWAY', confidence: 0 },
+          doubleChance: { prediction: 'HOME_OR_DRAW|AWAY_OR_DRAW', confidence: 0 },
           correctScore: { prediction: 'X-X', confidence: 0 },
           goalsOverUnder: {
             line: 2.5,
@@ -103,6 +105,7 @@ You must always return the exact JSON structure specified in the user message.`)
           summary: 'string',
           perMarket: {
             result: 'string',
+            doubleChance: 'string',
             correctScore: 'string',
             goalsOverUnder: 'string',
             bts: 'string',

@@ -86,6 +86,7 @@ export interface IMarketPrediction {
 
 export interface IMarkets {
   result?: IMarketPrediction;
+  doubleChance?: IMarketPrediction;
   correctScore?: IMarketPrediction;
   goalsOverUnder?: IMarketPrediction & { line?: number };
   bts?: IMarketPrediction;
@@ -98,6 +99,7 @@ export interface IReasoning {
   summary?: string;
   perMarket?: {
     result?: string;
+    doubleChance?: string;
     correctScore?: string;
     goalsOverUnder?: string;
     bts?: string;
@@ -118,6 +120,7 @@ export interface IOutcome {
   resolvedAt?: Date;
   accuracy?: {
     result?: boolean;
+    doubleChance?: boolean;
     correctScore?: boolean;
     goalsOverUnder?: boolean;
     bts?: boolean;
