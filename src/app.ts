@@ -7,9 +7,9 @@ import { errorHandler } from './middleware/errorHandler';
 import requestLogger from './middleware/requestLogger';
 
 import adminRoutes from './routes/admin.routes';
-import healthRoutes from './routes/health.routes';
 import authRoutes from './routes/auth.routes';
 import fixtureRoutes from './routes/fixture.routes';
+import healthRoutes from './routes/health.routes';
 import notificationRoutes from './routes/notification.routes';
 import predictionRoutes from './routes/prediction.routes';
 import stripeRoutes from './routes/stripe.routes';
@@ -18,6 +18,11 @@ import userRoutes from './routes/user.routes';
 import webhookRoutes from './routes/webhook.routes';
 
 const app = express();
+
+// Trust the first proxy hop (Back4App's reverse proxy) so that
+// req.ip and the X-Forwarded-For header are handled correctly by
+// express-rate-limit and other middleware that key off client IP.
+app.set('trust proxy', 1);
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
