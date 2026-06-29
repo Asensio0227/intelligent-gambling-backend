@@ -9,6 +9,7 @@ import {
   deleteTicket,
   getTicket,
   listOwnTickets,
+  resolveTicket,
   smartBuild,
 } from '../controllers/ticket.controller';
 import authMiddleware from '../middleware/auth';
@@ -24,6 +25,7 @@ router.post('/smart-build', authMiddleware, smartBuild);
 // CRUD routes
 router.post('/', authMiddleware, createNewTicket);
 router.get('/', authMiddleware, listOwnTickets);
+router.post('/:id/resolve', authMiddleware, resolveTicket);
 router.get('/:id', authMiddleware, getTicket);
 router.delete('/:id', authMiddleware, deleteTicket);
 

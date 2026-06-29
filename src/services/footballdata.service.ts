@@ -1,7 +1,7 @@
 import axios from 'axios';
-import logger from '../utils/logger';
 import config from '../config/footballdata';
 import { ApiFootballFixture } from '../types/apifootball.types';
+import logger from '../utils/logger';
 
 // football-data.org competition codes mapped to league info
 const COMPETITIONS = [
@@ -20,14 +20,20 @@ const COMPETITIONS = [
 const mapStatus = (status: string): string => {
   switch (status) {
     case 'SCHEDULED':
-    case 'TIMED': return 'NS';
+    case 'TIMED':
+      return 'NS';
     case 'IN_PLAY':
-    case 'PAUSED': return 'LIVE';
-    case 'FINISHED': return 'FT';
-    case 'POSTPONED': return 'PST';
+    case 'PAUSED':
+      return 'LIVE';
+    case 'FINISHED':
+      return 'FT';
+    case 'POSTPONED':
+      return 'PST';
     case 'CANCELLED':
-    case 'SUSPENDED': return 'CANC';
-    default: return 'NS';
+    case 'SUSPENDED':
+      return 'CANC';
+    default:
+      return 'NS';
   }
 };
 
@@ -35,7 +41,7 @@ const mapStatus = (status: string): string => {
 // so the rest of the codebase needs zero changes
 const mapToApiFootballFixture = (
   match: any,
-  competition: typeof COMPETITIONS[0],
+  competition: (typeof COMPETITIONS)[0],
 ): ApiFootballFixture => ({
   fixture: {
     id: match.id,
@@ -68,21 +74,23 @@ const mapToApiFootballFixture = (
       id: match.homeTeam?.id,
       name: match.homeTeam?.name,
       logo: match.homeTeam?.crest ?? null,
-      winner: match.score?.winner === 'HOME_TEAM'
-        ? true
-        : match.score?.winner === 'AWAY_TEAM'
-          ? false
-          : null,
+      winner:
+        match.score?.winner === 'HOME_TEAM'
+          ? true
+          : match.score?.winner === 'AWAY_TEAM'
+            ? false
+            : null,
     } as any,
     away: {
       id: match.awayTeam?.id,
       name: match.awayTeam?.name,
       logo: match.awayTeam?.crest ?? null,
-      winner: match.score?.winner === 'AWAY_TEAM'
-        ? true
-        : match.score?.winner === 'HOME_TEAM'
-          ? false
-          : null,
+      winner:
+        match.score?.winner === 'AWAY_TEAM'
+          ? true
+          : match.score?.winner === 'HOME_TEAM'
+            ? false
+            : null,
     } as any,
   },
   goals: {
@@ -122,7 +130,7 @@ export const fetchUpcomingFixturesFromFootballData = async (
         params: {
           dateFrom: fromDate,
           dateTo: toDate,
-          status: 'SCHEDULED,IN_PLAY,PAUSED,TIMED',
+          status: 'SCHEDULED,IN_PLAY,PAUSED,TIMED,FINISHED',
         },
       });
 
@@ -138,8 +146,7 @@ export const fetchUpcomingFixturesFromFootballData = async (
       });
 
       // Respect 10 calls/minute rate limit — 6 second delay between calls
-      await new Promise(resolve => setTimeout(resolve, 6000));
-
+      await new Promise((resolve) => setTimeout(resolve, 6000));
     } catch (err) {
       logger.error('football-data.org fetch failed', {
         competition: competition.name,

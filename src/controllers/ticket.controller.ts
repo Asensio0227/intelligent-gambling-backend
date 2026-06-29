@@ -173,6 +173,40 @@ export const deleteTicket = async (
   }
 };
 
+export const resolveTicket = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const ticket = await Ticket.findById(req.params.id);
+    if (!ticket) {
+      res.status(404).json({ success: false, data: {}, message: 'Ticket not found', error: 'Not found' });
+      return;
+    }
+
+    const createdByStr = ticket.createdBy?.toString();
+    const userIdStr = req.user?._id?.toString();
+    const userRole = req.user?.role;
+
+    if (createdByStr !== userIdStr && !['admin', 'superadmin'].includes(userRole || '')) {
+      res.status(403).json({ success: false, data: {}, message: 'Forbidden', error: 'Not authorized' });
+      return;
+    }
+
+    // Run the full resolve pipeline — it only touches unresolved predictions
+    // and pending tickets, so repeated calls are safe and idempotent.
+    const { runResolveOutcomes } = await import('../jobs/resolveOutcomes.job');
+    await runResolveOutcomes();
+
+    // Return the freshly resolved ticket
+    const updated = await Ticket.findById(req.params.id).lean();
+    res.json({ success: true, data: updated, message: 'Ticket resolved' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const smartBuild = async (
   req: Request,
   res: Response,

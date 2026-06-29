@@ -26,6 +26,7 @@ export interface IUser {
   role?: UserRole;
   isActive?: boolean;
   billing?: IBillingData;
+  pushToken?: string;
 }
 
 export interface IUserDocument extends IUser, Document {}
@@ -67,6 +68,7 @@ const userSchema = new Schema<IUserDocument>(
     },
     isActive: { type: Boolean, default: true },
     billing: { type: billingSchema, default: () => ({}) },
+    pushToken: { type: String, trim: true },
   },
   { timestamps: true },
 );

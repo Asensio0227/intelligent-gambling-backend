@@ -44,7 +44,7 @@ export const runResolveOutcomes = async (): Promise<void> => {
 };
 
 export const scheduleResolveOutcomes = (): ReturnType<typeof cron.schedule> =>
-  cron.schedule('0 * * * *', async () => {
+  cron.schedule('*/15 * * * *', async () => {
     logger.info('Running resolveOutcomes job');
     await runResolveOutcomes();
   });
