@@ -46,6 +46,7 @@ export const autoGenerateTickets = async (
       'cornersOverUnder',
       'yellowCards',
       'highestScoringHalf',
+      'doubleChance',
     ];
 
     for (const market of markets_list) {

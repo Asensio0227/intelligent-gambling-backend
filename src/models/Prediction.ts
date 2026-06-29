@@ -27,6 +27,7 @@ export interface IMarkets {
   cornersOverUnder?: IMarketPrediction & { line?: number };
   yellowCards?: IMarketPrediction & { line?: number };
   highestScoringHalf?: IMarketPrediction;
+  doubleChance?: IMarketPrediction;
 }
 
 export interface IReasoning {
@@ -112,6 +113,7 @@ const marketsSchema = new Schema<IMarkets>(
     cornersOverUnder: marketPredictionSchema,
     yellowCards: marketPredictionSchema,
     highestScoringHalf: marketPredictionSchema,
+    doubleChance: marketPredictionSchema,
   },
   { _id: false },
 );
