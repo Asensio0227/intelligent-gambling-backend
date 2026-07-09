@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { PipelineStage } from 'mongoose';
 import { Prediction } from '../models/Prediction';
 import { generatePredictionForFixture } from '../services/prediction.service';
 import { GeneratePredictionBody } from '../types/api.types';
@@ -90,13 +91,64 @@ export const listPredictions = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const predictions = await Prediction.find()
-      .populate('fixtureId generatedBy userId', 'fixtureId name email')
-      .lean();
+    const { date, team, sort } = req.query;
+
+    // Sort by fixture kickoff date: asc or desc (default desc = newest first)
+    const sortOrder = String(sort ?? 'desc').toLowerCase() === 'asc' ? 1 : -1;
+
+    const pipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'fixtures',
+          localField: 'fixtureId',
+          foreignField: '_id',
+          as: 'fixtureId',
+        },
+      },
+      { $unwind: { path: '$fixtureId', preserveNullAndEmptyArrays: true } },
+    ];
+
+    const match: Record<string, any> = {};
+
+    // Search by date: matches the whole day of the fixture's kickoff
+    if (date) {
+      const dayStart = new Date(String(date));
+      if (!isNaN(dayStart.getTime())) {
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(dayStart);
+        dayEnd.setDate(dayEnd.getDate() + 1);
+        match['fixtureId.kickoff'] = { $gte: dayStart, $lt: dayEnd };
+      }
+    }
+
+    // Search by team: partial, case-insensitive match on home or away team name
+    if (team) {
+      const teamRegex = new RegExp(String(team), 'i');
+      match.$or = [
+        { 'fixtureId.homeTeam.name': teamRegex },
+        { 'fixtureId.awayTeam.name': teamRegex },
+      ];
+    }
+
+    if (Object.keys(match).length > 0) {
+      pipeline.push({ $match: match });
+    }
+
+    pipeline.push({
+      $sort: { 'fixtureId.kickoff': sortOrder, createdAt: sortOrder },
+    });
+
+    const predictions = await Prediction.aggregate(pipeline);
+
+    // Populate generatedBy / userId (name + email) after aggregation
+    const populated = await Prediction.populate(predictions, [
+      { path: 'generatedBy', select: 'name email' },
+      { path: 'userId', select: 'name email' },
+    ]);
 
     res.json({
       success: true,
-      data: predictions,
+      data: populated,
       message: 'Predictions listed',
     });
   } catch (error) {

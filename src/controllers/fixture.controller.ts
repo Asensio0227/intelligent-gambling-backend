@@ -31,8 +31,8 @@ export const mapApiFixture = (
     venue: apiFixture.fixture?.venue?.name,
     status: (apiFixture.fixture?.status?.short || 'NS') as any,
     result: {
-      homeGoals: apiFixture.goals?.home || undefined,
-      awayGoals: apiFixture.goals?.away || undefined,
+      homeGoals: apiFixture.goals?.home ?? undefined,
+      awayGoals: apiFixture.goals?.away ?? undefined,
       htHomeGoals: (apiFixture.score?.halftime as any)?.home,
       htAwayGoals: (apiFixture.score?.halftime as any)?.away,
       corners: {
