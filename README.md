@@ -163,12 +163,20 @@ curl http://localhost:3000/api/health
 # UPDATE AWS DEPLOYMENT
 
 Good — the changes are already in. Now let's get this deployed to EC2. Open your AWS Session Manager terminal and run:
-bashsudo su - ubuntu
+
+# bash
+
+sudo su - ubuntu
 cd intelligent-gambler-backend
 Then on your local machine, upload the new zip:
-bashscp -i ~/Pictures/aws-amazon/intelligent-gambler/intelligent-gambler.pem "/home/mthee-junior/Documents/servers/intelligent gambler/bckend.zip" ubuntu@54.196.145.72:~
+
+# bash
+
+scp -i ~/Pictures/aws-amazon/intelligent-gambler/intelligent-gambler.pem "/home/mthee-junior/Documents/servers/intelligent gambler/bckend.zip" ubuntu@54.196.145.72:~
 Then back on the EC2 Session Manager terminal:
-bash# Replace the old source with the new zip
+
+# bash Replace the old source with the new zip
+
 cd ~
 rm -rf intelligent-gambler-backend
 unzip bckend.zip -d intelligent-gambler-backend
@@ -178,9 +186,13 @@ cd intelligent-gambler-backend
 
 nano .env
 Paste your env vars back in, save (Ctrl+O, Enter, Ctrl+X), then rebuild and restart:
-bashdocker stop ig-backend
+
+# bash
+
+docker stop ig-backend
 docker rm ig-backend
 docker build -t ig-backend .
 docker run -d --name ig-backend -p 3000:3000 --env-file .env --restart unless-stopped ig-backend
 docker logs -f ig-backend
+
 Let me know once the upload is done or if SCP times out (IP may have shifted again — just run curl -4 ifconfig.me and update the security group rule like before).

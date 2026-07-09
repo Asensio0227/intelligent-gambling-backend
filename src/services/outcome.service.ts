@@ -8,7 +8,10 @@ import { createNotification } from './notification.service';
 interface MatchOutcome {
   winner: 'HOME' | 'AWAY' | 'DRAW';
   correctScore: string;
+  homeGoals: number;
+  awayGoals: number;
   goalsTotal: number;
+  bothTeamsScored: boolean;
   cornersTotal: number;
   yellowCardsTotal: number;
   highestScoringHalf: 'FIRST' | 'SECOND' | 'EQUAL';
@@ -28,7 +31,14 @@ const getMatchOutcome = (fixture: any): MatchOutcome => {
     winner:
       homeGoals > awayGoals ? 'HOME' : homeGoals < awayGoals ? 'AWAY' : 'DRAW',
     correctScore: `${homeGoals}-${awayGoals}`,
+    homeGoals,
+    awayGoals,
     goalsTotal: homeGoals + awayGoals,
+    // BTS ("both teams to score") is only true when BOTH sides scored at
+    // least one goal each — e.g. 1-1, 2-1, 3-2. It is false for 0-0, and
+    // false for any scoreline where one side is held to 0 (e.g. 3-0, 1-0),
+    // even though the total goals in those matches is greater than zero.
+    bothTeamsScored: homeGoals > 0 && awayGoals > 0,
     cornersTotal:
       (fixture.result?.corners?.home || 0) +
       (fixture.result?.corners?.away || 0),
@@ -46,6 +56,12 @@ const getMatchOutcome = (fixture: any): MatchOutcome => {
   };
 };
 
+// Over/Under lines are always half-integers (0.5, 1.5, 2.5, 3.5, ...), which
+// is why strict > / < is correct here and there's never a "push"/tie case:
+//   Over 0.5  -> true when total >= 1
+//   Over 2.5  -> true when total >= 3
+//   Over 3.5  -> true when total >= 4
+//   Under 2.5 -> true when total <= 2
 const compareOverUnder = (
   total: number,
   line: number | undefined,
@@ -96,7 +112,7 @@ export const resolvePredictionOutcomes = async (): Promise<{
         (prediction.markets as any)?.goalsOverUnder?.prediction,
       ),
       bts:
-        (prediction.markets as any)?.bts?.prediction === actual.goalsTotal > 0,
+        (prediction.markets as any)?.bts?.prediction === actual.bothTeamsScored,
       cornersOverUnder: compareOverUnder(
         actual.cornersTotal,
         (prediction.markets as any)?.cornersOverUnder?.line,
