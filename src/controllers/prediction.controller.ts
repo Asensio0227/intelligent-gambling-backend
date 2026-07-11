@@ -138,7 +138,9 @@ export const listPredictions = async (
       $sort: { 'fixtureId.kickoff': sortOrder, createdAt: sortOrder },
     });
 
-    const predictions = await Prediction.aggregate(pipeline);
+    const predictions = await Prediction.aggregate(pipeline, {
+      allowDiskUse: true,
+    });
 
     // Populate generatedBy / userId (name + email) after aggregation
     const populated = await Prediction.populate(predictions, [
